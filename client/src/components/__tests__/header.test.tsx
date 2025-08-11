@@ -56,8 +56,8 @@ describe('Header Component', () => {
 
     render(<Header />);
 
-    expect(screen.getByText('Welcome, test@example.com')).toBeInTheDocument();
-    expect(screen.getByText(/Role:.*admin/)).toBeInTheDocument();
+    expect(screen.getByText('test@example.com')).toBeInTheDocument();
+    expect(screen.getAllByText('admin').length).toBeGreaterThan(0);
     expect(screen.getByText('Logout')).toBeInTheDocument();
     expect(screen.queryByText('Login')).not.toBeInTheDocument();
   });
@@ -79,8 +79,8 @@ describe('Header Component', () => {
 
     render(<Header />);
 
-    expect(screen.getByText('Welcome, user@example.com')).toBeInTheDocument();
-    expect(screen.getByText(/Role:.*user/)).toBeInTheDocument();
+    expect(screen.getByText('user@example.com')).toBeInTheDocument();
+    expect(screen.getAllByText('user').length).toBeGreaterThan(0);
   });
 
   it('should navigate to login page when login button is clicked', () => {
@@ -124,7 +124,7 @@ describe('Header Component', () => {
     expect(mockLogout).toHaveBeenCalled();
   });
 
-  it('should display complete title', () => {
+  it('should display Aisel Health title', () => {
     mockUseAuth.mockReturnValue({
       user: null,
       token: null,
@@ -135,6 +135,20 @@ describe('Header Component', () => {
 
     render(<Header />);
 
-    expect(screen.getByText('Aisel Health - Patient Management System')).toBeInTheDocument();
+    expect(screen.getByText('Aisel Health')).toBeInTheDocument();
+  });
+
+  it('should display Patient Management System subtitle on larger screens', () => {
+    mockUseAuth.mockReturnValue({
+      user: null,
+      token: null,
+      isAuthenticated: false,
+      login: jest.fn(),
+      logout: jest.fn(),
+    });
+
+    render(<Header />);
+
+    expect(screen.getByText('Patient Management System')).toBeInTheDocument();
   });
 });

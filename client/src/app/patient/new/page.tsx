@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import { useAuth } from '@/contexts/auth-context';
+import { usePermissions } from '@/hooks/usePermissions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -25,6 +26,7 @@ export default function CreatePatientPage() {
   const [error, setError] = useState('');
 
   const { token, isAuthenticated, user } = useAuth();
+  const { isAdmin } = usePermissions();
   const router = useRouter();
 
   const validateForm = () => {
@@ -93,7 +95,7 @@ export default function CreatePatientPage() {
     }
   };
 
-  if (!isAuthenticated || user?.role !== 'admin') {
+  if (!isAuthenticated || !isAdmin) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Card className="w-full max-w-md">
@@ -115,15 +117,18 @@ export default function CreatePatientPage() {
   }
 
   return (
-    <div className="min-h-screen p-8">
-      <div className="max-w-2xl mx-auto">
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         <div className="mb-6">
           <Button
             variant="outline"
             onClick={() => router.push('/home')}
-            className="mb-4"
+            className="mb-4 gap-2"
           >
-            ← Back to Patients
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            Back to Patients
           </Button>
         </div>
 

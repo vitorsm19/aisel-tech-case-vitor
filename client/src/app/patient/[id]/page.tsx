@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import axios from 'axios';
 import { useAuth } from '@/contexts/auth-context';
+import { usePermissions } from '@/hooks/usePermissions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -49,6 +50,7 @@ export default function PatientDetailPage() {
   const [error, setError] = useState('');
 
   const { token, isAuthenticated, user } = useAuth();
+  const { isAdmin } = usePermissions();
   const router = useRouter();
   const params = useParams();
   const id = params.id as string;
@@ -123,7 +125,7 @@ export default function PatientDetailPage() {
     setError('');
 
     try {
-      const response = await axios.put(
+      const response = await axios.patch(
         `http://localhost:3001/api/patients/${id}`,
         {
           firstName: firstName.trim(),
@@ -243,52 +245,63 @@ export default function PatientDetailPage() {
   const isAdmin = user?.role === 'admin';
 
   return (
-    <div className="min-h-screen p-8">
-      <div className="max-w-2xl mx-auto">
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         <div className="mb-6">
           <Button
             variant="outline"
             onClick={() => router.push('/home')}
-            className="mb-4"
+            className="mb-4 gap-2"
           >
-            ← Back to Patients
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            Back to Patients
           </Button>
         </div>
 
         <Card>
           <CardHeader>
-            <div className="flex justify-between items-center">
-              <CardTitle>
+            <div className="flex flex-col sm:flex-row gap-4 sm:gap-0 sm:justify-between sm:items-center">
+              <CardTitle className="text-xl sm:text-2xl">
                 {isEditing ? 'Edit Patient' : 'Patient Details'}
               </CardTitle>
-              {isAdmin && !isEditing && (
+              {!isEditing && isAdmin && (
                 <div className="flex gap-2">
                   <Button
                     onClick={() => setIsEditing(true)}
                     variant="outline"
+                    size="sm"
+                    className="gap-2"
                   >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
                     Edit
                   </Button>
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
-                      <Button variant="destructive">
+                      <Button variant="destructive" size="sm" className="gap-2">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
                         Delete
                       </Button>
                     </AlertDialogTrigger>
-                    <AlertDialogContent>
+                    <AlertDialogContent className="sm:max-w-md">
                       <AlertDialogHeader>
-                        <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                        <AlertDialogTitle>Delete Patient</AlertDialogTitle>
                         <AlertDialogDescription>
-                          This action cannot be undone. This will permanently delete
-                          the patient record for {patient?.firstName} {patient?.lastName}.
+                          Are you sure you want to delete <strong>{patient?.firstName} {patient?.lastName}</strong>? 
+                          This action cannot be undone.
                         </AlertDialogDescription>
                       </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogFooter className="flex-col sm:flex-row gap-2">
+                        <AlertDialogCancel className="w-full sm:w-auto">Cancel</AlertDialogCancel>
                         <AlertDialogAction
                           onClick={handleDelete}
                           disabled={deleting}
-                          className="bg-red-600 hover:bg-red-700"
+                          className="w-full sm:w-auto bg-red-600 hover:bg-red-700"
                         >
                           {deleting ? 'Deleting...' : 'Delete Patient'}
                         </AlertDialogAction>
