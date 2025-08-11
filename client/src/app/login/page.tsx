@@ -36,7 +36,7 @@ export default function LoginPage() {
 
       login(access_token, user);
       router.push("/home");
-    } catch (error: any) {
+    } catch (error) {
       setError("Invalid email or password");
       console.error("Login failed:", error);
     } finally {

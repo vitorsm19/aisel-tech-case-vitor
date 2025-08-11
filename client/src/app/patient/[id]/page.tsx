@@ -1,20 +1,15 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { useRouter, useParams } from 'next/navigation';
-import axios from 'axios';
-import { useAuth } from '@/contexts/auth-context';
-import { usePermissions } from '@/hooks/usePermissions';
-import MainLayout from '@/components/layout/main-layout';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { useState, useEffect } from "react";
+import { useRouter, useParams } from "next/navigation";
+import axios, { AxiosError } from "axios";
+import { useAuth } from "@/contexts/auth-context";
+import { usePermissions } from "@/hooks/usePermissions";
+import MainLayout from "@/components/layout/main-layout";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -25,7 +20,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from '@/components/ui/alert-dialog';
+} from "@/components/ui/alert-dialog";
 
 interface Patient {
   id: number;
@@ -38,17 +33,17 @@ interface Patient {
 
 export default function PatientDetailPage() {
   const [patient, setPatient] = useState<Patient | null>(null);
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [email, setEmail] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [dob, setDob] = useState('');
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [dob, setDob] = useState("");
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
-  const [errors, setErrors] = useState<{[key: string]: string}>({});
-  const [error, setError] = useState('');
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [error, setError] = useState("");
 
   const { token, isAuthenticated, user } = useAuth();
   const { isAdmin } = usePermissions();
@@ -65,13 +60,16 @@ export default function PatientDetailPage() {
   const fetchPatient = async () => {
     try {
       setLoading(true);
-      setError('');
+      setError("");
 
-      const response = await axios.get(`http://localhost:3001/api/patients/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`
+      const response = await axios.get(
+        `http://localhost:3001/api/patients/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
-      });
+      );
 
       const patientData = response.data;
       setPatient(patientData);
@@ -80,12 +78,12 @@ export default function PatientDetailPage() {
       setEmail(patientData.email);
       setPhoneNumber(patientData.phoneNumber);
       setDob(patientData.dob);
-    } catch (error: any) {
-      console.error('Error fetching patient:', error);
-      if (error.response?.status === 404) {
-        setError('Patient not found');
+    } catch (error) {
+      console.error("Error fetching patient:", error);
+      if (axios.isAxiosError(error) && error.response?.status === 404) {
+        setError("Patient not found");
       } else {
-        setError('Failed to fetch patient details');
+        setError("Failed to fetch patient details");
       }
     } finally {
       setLoading(false);
@@ -93,24 +91,24 @@ export default function PatientDetailPage() {
   };
 
   const validateForm = () => {
-    const newErrors: {[key: string]: string} = {};
+    const newErrors: { [key: string]: string } = {};
 
     if (!firstName.trim()) {
-      newErrors.firstName = 'First name is required';
+      newErrors.firstName = "First name is required";
     }
     if (!lastName.trim()) {
-      newErrors.lastName = 'Last name is required';
+      newErrors.lastName = "Last name is required";
     }
     if (!email.trim()) {
-      newErrors.email = 'Email is required';
+      newErrors.email = "Email is required";
     } else if (!/\S+@\S+\.\S+/.test(email)) {
-      newErrors.email = 'Email is invalid';
+      newErrors.email = "Email is invalid";
     }
     if (!phoneNumber.trim()) {
-      newErrors.phoneNumber = 'Phone number is required';
+      newErrors.phoneNumber = "Phone number is required";
     }
     if (!dob.trim()) {
-      newErrors.dob = 'Date of birth is required';
+      newErrors.dob = "Date of birth is required";
     }
 
     setErrors(newErrors);
@@ -123,7 +121,7 @@ export default function PatientDetailPage() {
     }
 
     setSaving(true);
-    setError('');
+    setError("");
 
     try {
       const response = await axios.patch(
@@ -133,24 +131,24 @@ export default function PatientDetailPage() {
           lastName: lastName.trim(),
           email: email.trim(),
           phoneNumber: phoneNumber.trim(),
-          dob: dob.trim()
+          dob: dob.trim(),
         },
         {
           headers: {
-            Authorization: `Bearer ${token}`
-          }
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
 
       const updatedPatient = response.data;
       setPatient(updatedPatient);
       setIsEditing(false);
-    } catch (error: any) {
-      console.error('Error updating patient:', error);
-      if (error.response?.status === 403) {
-        setError('You do not have permission to edit patients');
+    } catch (error) {
+      console.error("Error updating patient:", error);
+      if (axios.isAxiosError(error) && error.response?.status === 403) {
+        setError("You do not have permission to edit patients");
       } else {
-        setError('Failed to update patient. Please try again.');
+        setError("Failed to update patient. Please try again.");
       }
     } finally {
       setSaving(false);
@@ -159,22 +157,22 @@ export default function PatientDetailPage() {
 
   const handleDelete = async () => {
     setDeleting(true);
-    setError('');
+    setError("");
 
     try {
       await axios.delete(`http://localhost:3001/api/patients/${id}`, {
         headers: {
-          Authorization: `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
 
-      router.push('/home');
-    } catch (error: any) {
-      console.error('Error deleting patient:', error);
-      if (error.response?.status === 403) {
-        setError('You do not have permission to delete patients');
+      router.push("/home");
+    } catch (error) {
+      console.error("Error deleting patient:", error);
+      if (axios.isAxiosError(error) && error.response?.status === 403) {
+        setError("You do not have permission to delete patients");
       } else {
-        setError('Failed to delete patient. Please try again.');
+        setError("Failed to delete patient. Please try again.");
       }
       setDeleting(false);
     }
@@ -190,7 +188,7 @@ export default function PatientDetailPage() {
     }
     setIsEditing(false);
     setErrors({});
-    setError('');
+    setError("");
   };
 
   if (!isAuthenticated) {
@@ -200,11 +198,10 @@ export default function PatientDetailPage() {
           <CardContent className="pt-6">
             <div className="text-center">
               <h2 className="text-xl font-semibold mb-2">Access Denied</h2>
-              <p className="text-gray-600">Please log in to view patient details.</p>
-              <Button
-                onClick={() => router.push('/login')}
-                className="mt-4"
-              >
+              <p className="text-gray-600">
+                Please log in to view patient details.
+              </p>
+              <Button onClick={() => router.push("/login")} className="mt-4">
                 Login
               </Button>
             </div>
@@ -230,10 +227,7 @@ export default function PatientDetailPage() {
             <div className="text-center">
               <h2 className="text-xl font-semibold mb-2">Error</h2>
               <p className="text-gray-600">{error}</p>
-              <Button
-                onClick={() => router.push('/home')}
-                className="mt-4"
-              >
+              <Button onClick={() => router.push("/home")} className="mt-4">
                 Go Back
               </Button>
             </div>
@@ -249,11 +243,21 @@ export default function PatientDetailPage() {
         <div className="mb-6">
           <Button
             variant="outline"
-            onClick={() => router.push('/home')}
+            onClick={() => router.push("/home")}
             className="mb-4 gap-2"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 19l-7-7 7-7"
+              />
             </svg>
             Back to Patients
           </Button>
@@ -263,7 +267,7 @@ export default function PatientDetailPage() {
           <CardHeader>
             <div className="flex flex-col sm:flex-row gap-4 sm:gap-0 sm:justify-between sm:items-center">
               <CardTitle className="text-xl sm:text-2xl">
-                {isEditing ? 'Edit Patient' : 'Patient Details'}
+                {isEditing ? "Edit Patient" : "Patient Details"}
               </CardTitle>
               {!isEditing && isAdmin && (
                 <div className="flex gap-2">
@@ -273,16 +277,36 @@ export default function PatientDetailPage() {
                     size="sm"
                     className="gap-2"
                   >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                      />
                     </svg>
                     Edit
                   </Button>
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
                       <Button variant="destructive" size="sm" className="gap-2">
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        <svg
+                          className="w-4 h-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                          />
                         </svg>
                         Delete
                       </Button>
@@ -291,18 +315,23 @@ export default function PatientDetailPage() {
                       <AlertDialogHeader>
                         <AlertDialogTitle>Delete Patient</AlertDialogTitle>
                         <AlertDialogDescription>
-                          Are you sure you want to delete <strong>{patient?.firstName} {patient?.lastName}</strong>? 
-                          This action cannot be undone.
+                          Are you sure you want to delete{" "}
+                          <strong>
+                            {patient?.firstName} {patient?.lastName}
+                          </strong>
+                          ? This action cannot be undone.
                         </AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter className="flex-col sm:flex-row gap-2">
-                        <AlertDialogCancel className="w-full sm:w-auto">Cancel</AlertDialogCancel>
+                        <AlertDialogCancel className="w-full sm:w-auto">
+                          Cancel
+                        </AlertDialogCancel>
                         <AlertDialogAction
                           onClick={handleDelete}
                           disabled={deleting}
                           className="w-full sm:w-auto bg-red-600 hover:bg-red-700"
                         >
-                          {deleting ? 'Deleting...' : 'Delete Patient'}
+                          {deleting ? "Deleting..." : "Delete Patient"}
                         </AlertDialogAction>
                       </AlertDialogFooter>
                     </AlertDialogContent>
@@ -322,16 +351,18 @@ export default function PatientDetailPage() {
                       type="text"
                       value={firstName}
                       onChange={(e) => setFirstName(e.target.value)}
-                      className={errors.firstName ? 'border-red-500' : ''}
+                      className={errors.firstName ? "border-red-500" : ""}
                     />
                   ) : (
-                    <p className="p-2 bg-gray-50 rounded">{patient?.firstName}</p>
+                    <p className="p-2 bg-gray-50 rounded">
+                      {patient?.firstName}
+                    </p>
                   )}
                   {errors.firstName && (
                     <p className="text-red-500 text-sm">{errors.firstName}</p>
                   )}
                 </div>
-                
+
                 <div className="space-y-2">
                   <Label htmlFor="lastName">Last Name</Label>
                   {isEditing ? (
@@ -340,10 +371,12 @@ export default function PatientDetailPage() {
                       type="text"
                       value={lastName}
                       onChange={(e) => setLastName(e.target.value)}
-                      className={errors.lastName ? 'border-red-500' : ''}
+                      className={errors.lastName ? "border-red-500" : ""}
                     />
                   ) : (
-                    <p className="p-2 bg-gray-50 rounded">{patient?.lastName}</p>
+                    <p className="p-2 bg-gray-50 rounded">
+                      {patient?.lastName}
+                    </p>
                   )}
                   {errors.lastName && (
                     <p className="text-red-500 text-sm">{errors.lastName}</p>
@@ -359,7 +392,7 @@ export default function PatientDetailPage() {
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className={errors.email ? 'border-red-500' : ''}
+                    className={errors.email ? "border-red-500" : ""}
                   />
                 ) : (
                   <p className="p-2 bg-gray-50 rounded">{patient?.email}</p>
@@ -377,10 +410,12 @@ export default function PatientDetailPage() {
                     type="tel"
                     value={phoneNumber}
                     onChange={(e) => setPhoneNumber(e.target.value)}
-                    className={errors.phoneNumber ? 'border-red-500' : ''}
+                    className={errors.phoneNumber ? "border-red-500" : ""}
                   />
                 ) : (
-                  <p className="p-2 bg-gray-50 rounded">{patient?.phoneNumber}</p>
+                  <p className="p-2 bg-gray-50 rounded">
+                    {patient?.phoneNumber}
+                  </p>
                 )}
                 {errors.phoneNumber && (
                   <p className="text-red-500 text-sm">{errors.phoneNumber}</p>
@@ -395,7 +430,7 @@ export default function PatientDetailPage() {
                     type="date"
                     value={dob}
                     onChange={(e) => setDob(e.target.value)}
-                    className={errors.dob ? 'border-red-500' : ''}
+                    className={errors.dob ? "border-red-500" : ""}
                   />
                 ) : (
                   <p className="p-2 bg-gray-50 rounded">{patient?.dob}</p>
@@ -423,7 +458,7 @@ export default function PatientDetailPage() {
                     disabled={saving}
                     className="flex-1"
                   >
-                    {saving ? 'Saving...' : 'Save Changes'}
+                    {saving ? "Saving..." : "Save Changes"}
                   </Button>
                   <Button
                     variant="outline"
