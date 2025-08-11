@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Heart } from "lucide-react";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -46,8 +47,20 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl text-center">Sign in</CardTitle>
+        <CardHeader className="space-y-4">
+          {/* Logo and title */}
+          <div className="flex justify-center items-center gap-4 pb-6">
+            <div className="flex items-center justify-center w-16 h-16 bg-blue-600 rounded-xl">
+              <Heart className="w-9 h-9 text-white" />
+            </div>
+            <div className="text-center">
+              <h1 className="text-2xl font-bold text-gray-900">Aisel Health</h1>
+              <p className="text-sm text-gray-500">Patient Management System</p>
+            </div>
+          </div>
+          <CardTitle className="text-xl text-center">
+            Sign in to your account
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleLogin} className="space-y-4">
