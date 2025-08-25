@@ -169,7 +169,26 @@ npm run test        # Run tests
 
 ## 🔧 Environment Setup
 
-The application uses environment variables for configuration. In development, default values are used. For production, ensure proper environment configuration in your Docker setup.
+The application uses environment variables for configuration. In development, default values are used.
+
+### For Production Deployment:
+
+**Backend (Heroku/Railway):**
+```bash
+cd server
+# Deploy to your preferred platform
+# Make sure to set PORT environment variable (automatically set on Heroku)
+```
+
+**Frontend (Netlify):**
+Set environment variable: `NEXT_PUBLIC_API_URL=https://your-backend-url.com`
+
+### CORS Configuration
+The backend is configured to allow requests from:
+- `http://localhost:3000` (development)  
+- `https://vitor-aisel-tech-case.netlify.app` (production)
+
+Update `server/src/main.ts` with your frontend URL if different.
 
 ---
 
