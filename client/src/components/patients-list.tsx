@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import axios, { AxiosError } from "axios";
+import { API_ENDPOINTS } from "@/lib/api";
 import { useAuth } from "@/contexts/auth-context";
 import { usePermissions } from "@/hooks/usePermissions";
 import { Button } from "@/components/ui/button";
@@ -46,7 +47,7 @@ export default function PatientsList() {
       setLoading(true);
       setError(null);
 
-      const response = await axios.get("http://localhost:3001/api/patients", {
+      const response = await axios.get(API_ENDPOINTS.PATIENTS.BASE, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -56,7 +57,7 @@ export default function PatientsList() {
     } catch (error) {
       console.error("Error fetching patients:", error);
       setError(
-        "Failed to fetch patients. Make sure the backend is running on http://localhost:3001"
+        "Failed to fetch patients. Please check your connection."
       );
     } finally {
       setLoading(false);
@@ -68,7 +69,7 @@ export default function PatientsList() {
     setError(null);
 
     try {
-      await axios.delete(`http://localhost:3001/api/patients/${patientId}`, {
+      await axios.delete(API_ENDPOINTS.PATIENTS.BY_ID(patientId), {
         headers: {
           Authorization: `Bearer ${token}`,
         },

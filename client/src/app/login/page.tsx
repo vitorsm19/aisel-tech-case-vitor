@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
+import { API_ENDPOINTS } from "@/lib/api";
 import { useAuth } from "@/contexts/auth-context";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -25,7 +26,7 @@ export default function LoginPage() {
 
     try {
       const response = await axios.post(
-        "http://localhost:3001/api/auth/login",
+        API_ENDPOINTS.AUTH.LOGIN,
         {
           username: email,
           password: password,

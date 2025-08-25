@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import axios, { AxiosError } from "axios";
+import { API_ENDPOINTS } from "@/lib/api";
 import { useAuth } from "@/contexts/auth-context";
 import { usePermissions } from "@/hooks/usePermissions";
 import MainLayout from "@/components/layout/main-layout";
@@ -62,7 +63,7 @@ export default function CreatePatientPage() {
 
     try {
       const response = await axios.post(
-        "http://localhost:3001/api/patients",
+        API_ENDPOINTS.PATIENTS.BASE,
         {
           firstName: firstName.trim(),
           lastName: lastName.trim(),

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import axios, { AxiosError } from "axios";
+import { API_ENDPOINTS } from "@/lib/api";
 import { useAuth } from "@/contexts/auth-context";
 import { usePermissions } from "@/hooks/usePermissions";
 import MainLayout from "@/components/layout/main-layout";
@@ -63,7 +64,7 @@ export default function PatientDetailPage() {
       setError("");
 
       const response = await axios.get(
-        `http://localhost:3001/api/patients/${id}`,
+        API_ENDPOINTS.PATIENTS.BY_ID(id),
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -125,7 +126,7 @@ export default function PatientDetailPage() {
 
     try {
       const response = await axios.patch(
-        `http://localhost:3001/api/patients/${id}`,
+        API_ENDPOINTS.PATIENTS.BY_ID(id),
         {
           firstName: firstName.trim(),
           lastName: lastName.trim(),
@@ -160,7 +161,7 @@ export default function PatientDetailPage() {
     setError("");
 
     try {
-      await axios.delete(`http://localhost:3001/api/patients/${id}`, {
+      await axios.delete(API_ENDPOINTS.PATIENTS.BY_ID(id), {
         headers: {
           Authorization: `Bearer ${token}`,
         },
