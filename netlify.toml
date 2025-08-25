@@ -1,7 +1,8 @@
 [build]
 base = "client"
 command = "npm run build"
-publish = ".next"
+publish = "client/.next"
+ignore = "git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF"
 
 [build.environment]
 NEXT_PUBLIC_API_URL = "https://aisel-backend.herokuapp.com"
